@@ -1,0 +1,134 @@
+{% extends 'dashboardbase.html.twig' %}
+
+{% form_theme form _self %}
+{# override default template with custom block #}
+{% form_theme form 'form/fields.html.twig' %}
+
+
+{% block main_content %}
+
+    <div class="row">
+        <div class="col-md-4">
+            {{ include('student/aside.html.twig') }}
+        </div>
+        <div class="col-md-8">
+
+            <!-- https://symfony.com/doc/current/form/form_customization.html -->
+
+
+            <div class="box box-warning">
+                <!-- /.box-header -->
+                <div class="box-header with-border">
+                    <h3 class="box-title">Matriculaciones</h3>
+                </div>
+
+
+                {{ form_start(form, {'method': 'POST'}) }}
+
+                {{ form_widget(form.student, {'attr': {'value':student.getId()} }) }}
+
+
+                <div class="box-body">
+
+                    {% if not courses %}
+                    <div class="callout callout-warning">
+                        <h4>Alumno no matriculado</h4>
+                        <p>Este alumno parece que no está aún matriculado.</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(form.course) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.level) }}
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+
+                {{ form_row(form._token) }}
+
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary btn-flat pull-right">Matricular</button>
+                </div>
+
+                {{ form_end(form, {'render_rest': false}) }}
+
+                {% if courses %}
+                <hr>
+
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                        <th style="width:5%;">#</th>
+                        <th style="">Año</th>
+                        <th style="text-align:center;width:10%;">Curso</th>
+                        <th style="text-align:center;width:20%;">Fecha de alta</th>
+                        <th style="text-align:center;width:20%;">Nota media</th>
+                        <th style="">Progreso</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        </tr>
+
+                        {% for course in courses %}
+
+                        {% set subjects_total = subject.getNumSubject( course.getLevel() ) %}
+                        {% set subjects_approval = subject.getNumSubjectsApprovedByStudent( student.getId(), course.getCourse().getId(), course.getLevel() ) %}
+                        {% set subjects_average = subject.getAVGCourse( student.getId(), course.getCourse().getId(), course.getLevel() ) %}
+                        {% if subjects_total > 0 %}
+                            {% set progress_percentage = (subjects_approval / subjects_total) * 100 %}
+                        {% else %}
+                        {% set progress_percentage = 0 %}
+                        {% endif %}
+
+                        <tr>
+                            <td><i class="fa  fa-ellipsis-v"></i></td>
+                            <td>{{ course.getCourse().getName() }}</td>
+                            <td style="text-align:center;">{{ course.getLevel() }}º</td>
+                            <td style="text-align:center;">{{ course.getCreatedAt()|date("d/m/Y") }}</td>
+                            <td style="text-align:center;">{{ subjects_average|round(2) }}</td>
+                            <td style="text-align:center;">
+                                <div class="progress progress-xs">
+                                    <div class="progress-bar progress-bar-{% if progress_percentage >= 100 %}success{% else %}danger{% endif %}" style="width: {{ progress_percentage|round(0, 'floor') }}%;"></div>
+                                </div>
+                            </td>
+                            <td style="text-align:center;"><span class="badge bg-{% if progress_percentage >= 100 %}green{% else %}red{% endif %}">{{ progress_percentage|round(0,'floor') }}%</span></td>
+                            <td style="text-align:right;">
+                                <a href="{{ path('student_registration_grades', {id: student.getId(), rid: course.getId(), lid: course.getLevel() }) }}" class="btn-edit btn btn-default btn-xs"><i class="fa fa-pencil"></i> Notas</a>
+                            </td>
+                            <td>
+                                <a href="{{ path('student_registration_delete', {id: student.getId(), rid: course.getId() }) }}" title="Borrar" class="btn-delete btn btn-danger btn-xs"> <i class="fa fa-trash"></i> </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+{% block js_footer %}
+
+	{{ parent() }}
+
+	<!-- Date Picker -->
+	<script src="{{ asset('/assets/js/bootstrap-tagsinput/bootstrap-tagsinput.min.js') }}"></script>
+
+	<script>
+        jQuery(document).ready(function() {
+			$('#student_telephone').tagsinput();
+        });
+    </script>
+
+{% endblock %}

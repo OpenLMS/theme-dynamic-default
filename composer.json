@@ -1,0 +1,12 @@
+{
+    "name": "openlms/theme-dynamic-default",
+    "description": "The basic dynamic theme for openlms",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Hector Prats",
+            "email": "hectorpratsortega@gmail.com"
+        }
+    ],
+    "require": {}
+}

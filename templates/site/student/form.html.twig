@@ -1,0 +1,136 @@
+{% extends 'dashboardbase.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('/assets/vendor/bootstrap-datepicker/dist/css/bootstrap-datepicker.css') }}">
+{% endblock %}
+
+
+{% form_theme form _self %}
+{# override default template with custom block #}
+{% form_theme form 'form/fields.html.twig' %}
+
+
+{% block main_content %}
+
+
+	<!-- https://symfony.com/doc/current/form/form_customization.html -->
+
+	{{ form_start(form, {'method': 'POST'}) }}
+
+	<div class="box box-default">
+	    <!-- /.box-header -->
+		<div class="box-header with-border">
+			<h3 class="box-title">Datos personales</h3>
+		</div>
+
+	    <div class="box-body">
+	    	<div class="row">
+			    <div class="col-md-4">
+			        {{ form_row(form.name) }}
+			    </div>
+			    <div class="col-md-4">
+			        {{ form_row(form.surname) }}
+			    </div>
+			    <div class="col-md-4">
+			        {{ form_row(form.genre) }}
+			    </div>
+			</div>
+			<div class="row">
+			    <div class="col-md-4">
+			        {{ form_row(form.birthdate, {'attr': {'class': 'js-datepicker'}}) }}
+			    </div>
+			    <div class="col-md-4">
+			        {{ form_row(form.email) }}
+			    </div>
+			    <div class="col-md-4">
+			        {{ form_row(form.dni) }}
+			    </div>
+			</div>
+
+	    </div>
+	    <!-- /.box-body -->
+
+		<div class="box-header with-border">
+			<h3 class="box-title">Datos de contacto</h3>
+		</div>
+		<!-- /.box-header -->
+		<div class="box-body">
+			<div class="row">
+				<div class="col-md-8">
+					{{ form_row(form.address) }}
+				</div>
+				<div class="col-md-4">
+					{{ form_row(form.cp) }}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					{{ form_row(form.town) }}
+				</div>
+				<div class="col-md-4">
+					{{ form_row(form.province) }}
+				</div>
+				<div class="col-md-4">
+					{{ form_row(form.country) }}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					{{ form_row(form.telephone) }}
+				</div>
+			</div>
+		</div>
+
+		<div class="box-header with-border">
+			<h3 class="box-title">Personalización de la plataforma</h3>
+		</div>
+
+		<!-- /.box-header -->
+		<div class="box-body">
+			<div class="row">
+				<div class="col-md-4">
+					{{ form_row(form.language) }}
+				</div>
+			</div>
+		</div>
+		{{ form_row(form._token) }}
+
+		<div class="box-footer">
+			{% if student is defined %}
+			<a href="{{ path('student_registration', {id: student.getId() }) }}" type="button" class="btn btn-default btn-flat">Matriculaciones</a>
+			{% endif %}
+			<button type="submit" class="btn btn-primary btn-flat pull-right">Enviar</button>
+		</div>
+
+	</div>
+	{{ form_end(form, {'render_rest': false}) }}
+
+
+{% endblock %}
+
+
+{% block js_footer %}
+
+	{{ parent() }}
+
+	<!-- Date Picker -->
+	<script src="{{ asset('/assets/vendor/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+	<script src="{{ asset('/assets/vendor/bootstrap-datepicker/dist/locales/bootstrap-datepicker.' ~ app.request.locale ~ '.min.js') }}"></script>
+
+	<script src="{{ asset('/assets/js/bootstrap-tagsinput/bootstrap-tagsinput.min.js') }}"></script>
+
+	<script>
+        jQuery(document).ready(function() {
+
+			$('.js-datepicker').datepicker({
+				autoclose: true,
+				orientation: 'auto bottom',
+				language: '{{ app.request.getLocale() }}'
+			});
+
+			$('#student_telephone').tagsinput();
+        });
+    </script>
+
+{% endblock %}
